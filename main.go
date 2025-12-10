@@ -14,8 +14,8 @@ import (
 )
 
 type Node struct {
-	ID    string            `json:"id"`
-	Props map[string]string `json:"props,omitempty"`
+	ID    string                 `json:"id"`
+	Props map[string]interface{} `json:"props,omitempty"`
 }
 
 type Edge struct {
