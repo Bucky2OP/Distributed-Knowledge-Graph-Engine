@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  store:
+    build:
+      context: .
+      dockerfile: Dockerfile.go
+    container_name: graph-store
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - graph-network
+    restart: unless-stopped
+
+  analyzer:
+    build:
+      context: .
+      dockerfile: Dockerfile.py
+    container_name: graph-analyzer
+    depends_on:
+      store:
+        condition: service_healthy
+    networks:
+      - graph-network
+    command: python analyze.py http://store:8080
+    restart: "no"
+
+networks:
+  graph-network:
+    driver: bridge
